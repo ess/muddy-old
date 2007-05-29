@@ -63,7 +63,10 @@ adding triggers to the scripting interface, but they're not quite ready (read
 connection dropped for the week").
 
 To use user scripts, just drop them in a file in ~/.muddy called
-user_methods.rb
+user_methods.rb, and to use your scripts just execute them from the Muddy
+command line like so:  
+
+  /scriptname "this is a string argument", "this is another"
 
 There is an example user_methods.rb in the examples directory of the Muddy
 source.  Please feel free to use this as a basis for your scripts.
