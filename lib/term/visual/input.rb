@@ -64,10 +64,32 @@ module Term
 				end
 
 				case k
+        when 'KEY_UP'
+          # This should work well enough for history browsing.
+          unless @history_pos <= 0
+            @history_pos = @history_pos - 1
+            @data = @history[@history_pos].dup
+            @cursor = @data.length
+          end
+        when 'KEY_DOWN'
+          # This, too.
+          unless @history_pos >= (@history.length - 1)
+            @history_pos = @history_pos + 1
+            @data = @history[@history_pos].dup
+            @cursor = @data.length
+          else
+            @data = ''
+            @cursor = 0
+          end
 				when 'KEY_ENTER', '^M'
 					@history.push(@data.dup)
 					@data = ""
 					@cursor = 0
+          # Added the next line to keep history size down.  Let's face it ...
+          # if you need more than 100 lines of history in a MUD, you're not
+          # playing the game, you're playing the client.
+          @history.delete_at(0) if @history.length > 100
+          @history_pos = @history.length
 					ret = @history[-1]
 				when 'KEY_BACKSPACE', '^H', '^?'
 					if @cursor > 0

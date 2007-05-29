@@ -1,10 +1,26 @@
 MUDdy
 -----
-
 Muddy started out as a desire to give another client, Muby, a prettier UI.
 
 That's still about all that it is, but the only thing that actually came
 from Muby was the connection code.
+
+Code
+----
+As I mentioned already, Muddy uses selected chunks of the connection code
+from Muby (http://rubyforge.org/projects/muby) in order to handle telnet
+communications.  The telnet protocol isn't really fully supported, but it
+works well enough with the only MUD that I actually play, so there you go.
+
+The user interface is a slightly modified version of termvisual-0.0.3.  The
+reason that it's included in the archive is that 0.0.3 is the last version of
+termvisual (http://rubyforge.org/projects/termvisual) that didn't make use
+of an event system that is only available in Mac OS X.  Also, in order to get
+the color display code working properly, I had to disallow the wrapping of
+text.  This leads to a slightly obnoxious bug, which is detailed in the Bugs
+section of this text.  Also, since I'm tailoring termvisual to this project
+anyways, I went ahead and added KEY_UP and KEY_DOWN to the default bindings.
+Further, the command history is capped at 100 entries.
 
 Usage
 -----
@@ -13,6 +29,31 @@ Usage
 Example
 -------
 ./muddy.rb scrymud.net 4444
+
+Differences from Muby
+---------------------
+Aside from the user interface, the only real difference between Muddy and Muby
+at this point (so far as a user should see) is in the scripting interface.
+
+I'm using a MUCH simpler scripting mechanism than Muby does, particularly in
+the trigger system (see Triggers).  Muby allows for one to link a trigger to
+predefined methods (via Symbols), raw strings, and Threads.  Muddy allows one
+to link triggers only to raw strings, but the mechanism used allows for one
+to use predefined methods by listing the method name as a string.
+
+Another difference, specifically in triggers, is that match output (like that
+which would be yielded by regexp grouping) is not passed on to the string
+that is called when the trigger fires.  Considering that I never actually got
+that to work in Muby, I'm thinking that I won't be hearing a lot of people
+complain, but I'll consider implementing it if I hear enough jag about it.
+
+Hey, how about another difference relating to triggers ... there are no local
+triggers.  I really don't see the point in them, and they actually cause
+the footprint of the program to go up while causing the efficiency to go
+down.  Not a good mix.
+
+Finally, there is no conf construct in Muddy.  I don't like it.  Live with it.
+
 
 Scripting
 ---------
@@ -26,6 +67,83 @@ user_methods.rb
 
 There is an example user_methods.rb in the examples directory of the Muddy
 source.  Please feel free to use this as a basis for your scripts.
+
+There are only three built-in methods for user scripting.  These are print
+(print to the local window), echo (an alias to print), and send (send text
+to the MUD).  Following is a simple userscript that uses all three of these
+methods:
+
+def get_and_wear(item)
+  print "Getting #{item} and wearing it ..."
+  send "get #{item}"
+  send "wear #{item}"
+  echo "Finished with #{item}."
+end
+
+While the scripting system might seem overly simplistic, I've scarcely had the
+need for more than this.  For a real-world example, check out this keepalive
+method that I use on ScryMUD (also in the example user_methods.rb file):
+
+def keepalive
+  @mythread = Thread.new do
+    loop do
+      sleep 60
+      send ""
+    end
+  end
+end
+
+Since all scripts are invoked through Ruby's eval method, anything that you
+have available to you in Ruby is also available to you in Muddy scripting.
+This even includes the ability to load other libraries and modules if you
+so wish.  Heck ... just saying that gives me the notion to write an automapper
+that uses the ruby gtk+ bindings (though I'm not going to).
+
+Also, just to throw another layer of complexity on top of what should be a
+really simple scripting system, let's talk about triggers ...
+
+Triggers
+--------
+While the basic scripting system allows for a lot of active waylaying and so
+on, sometimes, you just want to let your aggression be a little more passive.
+That is that you'll want to react to what's going on instead of just causing
+everything to happen.  That's where triggers come in.
+
+Instead of being terribly long-winded on the subject, I'm just going to give
+you an example.  Let's assume that you only ever use one particular weapon.
+Let's further assume that there are baddies in the realm that are capable of
+disarming you.  Let's further assume that you hate it when those rat bastards
+disarm you, but you don't want to be bothered to pick your weapon up and re-
+equip it.  Well, my friend, the following is for you:
+
+@triggers["disarms you"] = "getmydamnedswordback"
+
+def getmydamnedswordback
+  send "get sword"
+  send "wield sword"
+end
+
+That's all there is to it.  If the text "disarms you" comes across your
+connection, "get sword" and "wear sword" will be sent to the server.
+
+The key for your trigger (the bit between the square brackets) can be either
+a raw string or a proper regular expression ... makes no nevermind to old
+Muddy.
+
+There are a few decent (even though I'm forced to say so myself) examples of
+terribly convoluted triggers in the included example user_methods.rb ... I
+use them every time I play, so there you go.
+
+Bugs
+----
+Due to the nature of the beast that is termvisual, there is one somewhat
+annoying bug in Muddy.  I'm working on it, but haven't quite squashed it
+yet, so here's the skinny:  There is no text wrapping.
+
+You see, because of the way that termvisual does colors (via tags inserted
+into the line that you want displayed), termvisual's wrapping method was
+causing lines to come out broken.  If the break was in the middle of one
+of the color tags, then the color tag would be displayed.  It's a mess.
 
 -- Scruff
 pooster@gmail.com
