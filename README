@@ -1,0 +1,31 @@
+MUDdy
+-----
+
+Muddy started out as a desire to give another client, Muby, a prettier UI.
+
+That's still about all that it is, but the only thing that actually came
+from Muby was the connection code.
+
+Usage
+-----
+/path/to/muddy.rb server port
+
+Example
+-------
+./muddy.rb scrymud.net 4444
+
+Scripting
+---------
+There's pretty limited scripting support at the moment.  I'm working on
+adding triggers to the scripting interface, but they're not quite ready (read
+"I haven't started on it, as I wanted to get this bastard uploaded before my
+connection dropped for the week").
+
+To use user scripts, just drop them in a file in ~/.muddy called
+user_methods.rb
+
+There is an example user_methods.rb in the examples directory of the Muddy
+source.  Please feel free to use this as a basis for your scripts.
+
+-- Scruff
+pooster@gmail.com
