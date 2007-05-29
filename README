@@ -68,6 +68,9 @@ command line like so:
 
   /scriptname "this is a string argument", "this is another"
 
+Truth be told, you can stick any arbitrary ruby code into the command line,
+so long as '/' is the first character in the buffer.
+
 There is an example user_methods.rb in the examples directory of the Muddy
 source.  Please feel free to use this as a basis for your scripts.
 
