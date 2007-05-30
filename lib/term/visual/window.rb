@@ -160,6 +160,9 @@ module Term
 						#	@buffer.push(l)
 						#}
             @buffer.push s
+            
+            self.trimbuffer
+
 					}
 				end
 				refresh_buffer
@@ -168,6 +171,17 @@ module Term
 				return str
 			end
 			
+      # You know, I'm sure that the termvisual people think that an infinite
+      # buffer is a good idea, but they would be wrong.
+      def trimbuffer
+        if @buflines.length > 200
+          @buflines = @buflines[(@buflines.length - 200) .. @buflines.length]
+        end
+        if @buffer.length > 200
+          @buffer = @buffer[(@buffer.length - 200) .. @buffer.length]
+        end
+      end
+
 			def print(*args)
 				args.each { |arg|
 					self.addline(arg) if arg.respond_to?(:to_str)
