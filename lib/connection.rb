@@ -175,7 +175,7 @@ class Connection
       #else
         value = c.chr
       #end
-      @showBuffer << value unless [10, 0, 13].include? c
+      @showBuffer << value #unless [10, 0, 13].include? c
       manage_buffer(c)
     end
   end

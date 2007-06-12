@@ -48,7 +48,7 @@ module Term
 			def initialize(parent, hash)
 				@parent = parent
 
-        #@logger = Logger.new
+        @logger = Logger.new
 
 				@bufsize = hash["bufsize"] || 500
 				
@@ -129,7 +129,7 @@ module Term
             line << "%(#{tok[1]})"
           when :text
             tok[1].split(//).each do |char|
-              if rlen(line+char) >= max_size - rlen(prefix)
+              if rlen(line+char) >= max_size# - rlen(prefix)
                 all.push(line)
                 line = ""
               end
@@ -143,7 +143,7 @@ module Term
 			private :wrap
 
 			def addline(str, prefix="")
-        #@logger.log_message("addline", str)
+        @logger.log_message("addline", str)
 				if @global_prefix.kind_of?(String)
 					dp = @global_prefix.dup
 				elsif @global_prefix.respond_to?(:call)
@@ -340,8 +340,9 @@ module Term
 				len
 =end
 				str = str.dup
-				str.gsub!(/(\A|[^%])%\(.+?\)/, '\1')
-				str.gsub!(/%%\((.+?)\)/, '%(\1)')
+				#str.gsub!(/(\A|[^%])%\(.*?\)/, '\1')
+				#str.gsub!(/%%\((.*?)\)/, '%(\1)')
+        str.gsub!(/%\(.*?\)/, "")
 				str.length
 				# BROKENX0R
 				#(str.gsub(/(^|[^%])%\(.+?\)/, '') + ($1 ? $1 : '')).length
