@@ -47,23 +47,21 @@ class Connection
 
   def display_buffer
     unless @showBuffer.empty?
-      #@showBuffer.join('').split(/\n/).each {|line|
-      #  @window.print(line)
-      #}
-      #temp = @showBuffer.gsub(/\%\(([a-z]|[A-Z]| )+\)/,'').gsub(/ +/,' ')
-      #@userscript.match_triggers(temp)
-      @showBuffer.gsub(/\[0m/, "\n\n")
-      @window.print(*@showBuffer + "\n")
+      #logfile = File.open("logfile.txt", "a")
+      @showBuffer.gsub(/\[0m/, "")
+      @window.print(*@showBuffer )
+      #logfile.print(*@showBuffer)
+      #logfile.close
     end
     @showBuffer = ""
   end
  
   def manage_buffer(c)
-    if c == 10 or c == 0
+    if c == 10 or c == 0 or c == 13
       temp = @showBuffer.gsub(/\%\(([a-z]|[A-Z]| )+\)/,'').gsub(/ +/,' ')
       @userscript.match_triggers(temp)
       display_buffer
-      @showBuffer = insert_style(@fgcolor, @bgcolor)
+      #@showBuffer = insert_style(@fgcolor, @bgcolor)
     end
   end
 
@@ -151,20 +149,14 @@ class Connection
           if reset
             #@fgcolor = @bgcolor = 'default'
             insert_style('default')
-            @showBuffer << "%(default)"
+  #          @showBuffer << "%(default)"
           else
             @vt.palette.setcolor("#{fgcolor} on #{bgcolor ? bgcolor : 'default'}", "#{fgcolor} on #{bgcolor ? bgcolor : 'default'}" )
             @fgcolor = fgcolor
             @bgcolor = bgcolor ? bgcolor : 'default'
             insert_style(@fgcolor, @bgcolor)
-            @showBuffer << "%(#{fgcolor} on #{bgcolor ? bgcolor : 'default'})"
+   #         @showBuffer << "%(#{fgcolor} on #{bgcolor ? bgcolor : 'default'})"
           end
-          #if reset
-          #  style = Muby::Style.new(attributes, fgcolor, bgcolor, false)
-          #else
-          #  style = Muby::Style.new(attributes, fgcolor, bgcolor, true)
-          #end
-          #@showBuffer.push(style)
         end
       end
       else #if ! conf.broken_keycodes.include?(c)
@@ -183,7 +175,7 @@ class Connection
       #else
         value = c.chr
       #end
-      @showBuffer << value
+      @showBuffer << value #unless [10, 0, 13].include? c
       manage_buffer(c)
     end
   end

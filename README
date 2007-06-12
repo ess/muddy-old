@@ -57,11 +57,6 @@ Finally, there is no conf construct in Muddy.  I don't like it.  Live with it.
 
 Scripting
 ---------
-There's pretty limited scripting support at the moment.  I'm working on
-adding triggers to the scripting interface, but they're not quite ready (read
-"I haven't started on it, as I wanted to get this bastard uploaded before my
-connection dropped for the week").
-
 To use user scripts, just drop them in a file in ~/.muddy called
 user_methods.rb, and to use your scripts just execute them from the Muddy
 command line like so:  
@@ -142,14 +137,9 @@ use them every time I play, so there you go.
 
 Bugs
 ----
-Due to the nature of the beast that is termvisual, there is one somewhat
-annoying bug in Muddy.  I'm working on it, but haven't quite squashed it
-yet, so here's the skinny:  There is no text wrapping.
+The text wrapping bug has been fixed as of 2007-06-12.
 
-You see, because of the way that termvisual does colors (via tags inserted
-into the line that you want displayed), termvisual's wrapping method was
-causing lines to come out broken.  If the break was in the middle of one
-of the color tags, then the color tag would be displayed.  It's a mess.
+There have been no other bugs brought to my attention.
 
 -- Scruff
 pooster@gmail.com

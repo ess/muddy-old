@@ -1,5 +1,6 @@
 require 'ncurses'
 require 'strscan'
+require 'lib/logger'
 
 class String
 	def tokenize &block
@@ -46,6 +47,8 @@ module Term
 			
 			def initialize(parent, hash)
 				@parent = parent
+
+        @logger = Logger.new
 
 				@bufsize = hash["bufsize"] || 500
 				
@@ -116,30 +119,31 @@ module Term
       end
 
 			def wrap(str, max_size, prefix="")
-				all = []
-				line = ''
-				str.split(/ /).each { |w|
-					if rlen(line+w) >= max_size - rlen(prefix)
-						all.push(line)
-						line = ''
-					end
-					w ||= ' '
-					line += line == '' ? w : ' ' + w
-				}
-				a = true
-				all.push(line).collect { |i|
-					if a
-						i = prefix + i
-						a = false
-					else
-						i = " " * rlen(prefix) + i
-					end
-					i
-				}
+        # This is my attempt to fix line wrapping.
+        all = []
+        line = ""
+        tokens = str.tokenize
+        tokens.each do |tok|
+          case tok[0]
+          when :tag
+            line << "%(#{tok[1]})"
+          when :text
+            tok[1].split(//).each do |char|
+              if rlen(line+char) >= max_size# - rlen(prefix)
+                all.push(line)
+                line = ""
+              end
+              line << char
+            end
+          end
+        end
+        all << line
+        all
 			end
 			private :wrap
 
 			def addline(str, prefix="")
+        @logger.log_message("addline", str)
 				if @global_prefix.kind_of?(String)
 					dp = @global_prefix.dup
 				elsif @global_prefix.respond_to?(:call)
@@ -153,16 +157,17 @@ module Term
 				end
 
 				if str.respond_to?(:to_str)
-					str.split(/\n/).each { |s|
-						s.delete!("\r")
-						@buflines.push([prefix.dup, s.dup])
-						#wrap(s, Ncurses.COLS, prefix).each { |l|
-						#	@buffer.push(l)
-						#}
-            @buffer.push s
+					str.split(/\r/).each { |s|
+						s.delete!("\n")
+            if s.length > 0
+						  @buflines.push([prefix.dup, s.dup])
+						  wrap(s, Ncurses.COLS, prefix).each { |l|
+							  @buffer.push(l)
+					  	}
+      #      @buffer.push s
             
-            self.trimbuffer
-
+              self.trimbuffer
+            end
 					}
 				end
 				refresh_buffer
@@ -293,7 +298,7 @@ module Term
 				default ||= "default"
 				default = "default" if !@parent.palette[default]
 
-				win.attrset(@parent.palette[default])
+				#win.attrset(@parent.palette[default])
 
 				# re = /(^|[^%])%\((.+?)\)/
 
@@ -311,8 +316,8 @@ module Term
 					when :tag
 						if @parent.palette[tok[1]]
 							win.attrset(@parent.palette[tok[1]])
-						else
-							win.attrset(@parent.palette[default])
+#						else
+#							win.attrset(@parent.palette[default])
 						end
 					when :text
 						win.move(y, x)
@@ -320,7 +325,7 @@ module Term
 						x += tok[1].length
 					end
 				}
-				win.attrset(@parent.palette[default])
+#				win.attrset(@parent.palette[default])
 			end
 
 			def rlen(str)
@@ -335,8 +340,9 @@ module Term
 				len
 =end
 				str = str.dup
-				str.gsub!(/(\A|[^%])%\(.+?\)/, '\1')
-				str.gsub!(/%%\((.+?)\)/, '%(\1)')
+				#str.gsub!(/(\A|[^%])%\(.*?\)/, '\1')
+				#str.gsub!(/%%\((.*?)\)/, '%(\1)')
+        str.gsub!(/%\(.*?\)/, "")
 				str.length
 				# BROKENX0R
 				#(str.gsub(/(^|[^%])%\(.+?\)/, '') + ($1 ? $1 : '')).length
