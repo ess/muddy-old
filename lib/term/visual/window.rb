@@ -1,5 +1,6 @@
 require 'ncurses'
 require 'strscan'
+require 'lib/logger'
 
 class String
 	def tokenize &block
@@ -46,6 +47,8 @@ module Term
 			
 			def initialize(parent, hash)
 				@parent = parent
+
+        #@logger = Logger.new
 
 				@bufsize = hash["bufsize"] || 500
 				
@@ -140,6 +143,7 @@ module Term
 			private :wrap
 
 			def addline(str, prefix="")
+        #@logger.log_message("addline", str)
 				if @global_prefix.kind_of?(String)
 					dp = @global_prefix.dup
 				elsif @global_prefix.respond_to?(:call)
@@ -294,7 +298,7 @@ module Term
 				default ||= "default"
 				default = "default" if !@parent.palette[default]
 
-				win.attrset(@parent.palette[default])
+				#win.attrset(@parent.palette[default])
 
 				# re = /(^|[^%])%\((.+?)\)/
 
@@ -312,8 +316,8 @@ module Term
 					when :tag
 						if @parent.palette[tok[1]]
 							win.attrset(@parent.palette[tok[1]])
-						else
-							win.attrset(@parent.palette[default])
+#						else
+#							win.attrset(@parent.palette[default])
 						end
 					when :text
 						win.move(y, x)
@@ -321,7 +325,7 @@ module Term
 						x += tok[1].length
 					end
 				}
-				win.attrset(@parent.palette[default])
+#				win.attrset(@parent.palette[default])
 			end
 
 			def rlen(str)

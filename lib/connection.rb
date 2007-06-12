@@ -47,11 +47,11 @@ class Connection
 
   def display_buffer
     unless @showBuffer.empty?
-      logfile = File.open("logfile.txt", "a")
+      #logfile = File.open("logfile.txt", "a")
       @showBuffer.gsub(/\[0m/, "")
       @window.print(*@showBuffer )
-      logfile.print(*@showBuffer)
-      logfile.close
+      #logfile.print(*@showBuffer)
+      #logfile.close
     end
     @showBuffer = ""
   end
@@ -61,7 +61,7 @@ class Connection
       temp = @showBuffer.gsub(/\%\(([a-z]|[A-Z]| )+\)/,'').gsub(/ +/,' ')
       @userscript.match_triggers(temp)
       display_buffer
-      @showBuffer = insert_style(@fgcolor, @bgcolor)
+      #@showBuffer = insert_style(@fgcolor, @bgcolor)
     end
   end
 
@@ -149,20 +149,14 @@ class Connection
           if reset
             #@fgcolor = @bgcolor = 'default'
             insert_style('default')
-            @showBuffer << "%(default)"
+  #          @showBuffer << "%(default)"
           else
             @vt.palette.setcolor("#{fgcolor} on #{bgcolor ? bgcolor : 'default'}", "#{fgcolor} on #{bgcolor ? bgcolor : 'default'}" )
             @fgcolor = fgcolor
             @bgcolor = bgcolor ? bgcolor : 'default'
             insert_style(@fgcolor, @bgcolor)
-            @showBuffer << "%(#{fgcolor} on #{bgcolor ? bgcolor : 'default'})"
+   #         @showBuffer << "%(#{fgcolor} on #{bgcolor ? bgcolor : 'default'})"
           end
-          #if reset
-          #  style = Muby::Style.new(attributes, fgcolor, bgcolor, false)
-          #else
-          #  style = Muby::Style.new(attributes, fgcolor, bgcolor, true)
-          #end
-          #@showBuffer.push(style)
         end
       end
       else #if ! conf.broken_keycodes.include?(c)
