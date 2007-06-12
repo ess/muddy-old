@@ -47,19 +47,17 @@ class Connection
 
   def display_buffer
     unless @showBuffer.empty?
-      #@showBuffer.join('').split(/\n/).each {|line|
-      #  @window.print(line)
-      #}
-      #temp = @showBuffer.gsub(/\%\(([a-z]|[A-Z]| )+\)/,'').gsub(/ +/,' ')
-      #@userscript.match_triggers(temp)
-      @showBuffer.gsub(/\[0m/, "\n\n")
-      @window.print(*@showBuffer + "\n")
+      logfile = File.open("logfile.txt", "a")
+      @showBuffer.gsub(/\[0m/, "")
+      @window.print(*@showBuffer )
+      logfile.print(*@showBuffer)
+      logfile.close
     end
     @showBuffer = ""
   end
  
   def manage_buffer(c)
-    if c == 10 or c == 0
+    if c == 10 or c == 0 or c == 13
       temp = @showBuffer.gsub(/\%\(([a-z]|[A-Z]| )+\)/,'').gsub(/ +/,' ')
       @userscript.match_triggers(temp)
       display_buffer
@@ -183,7 +181,7 @@ class Connection
       #else
         value = c.chr
       #end
-      @showBuffer << value
+      @showBuffer << value unless [10, 0, 13].include? c
       manage_buffer(c)
     end
   end

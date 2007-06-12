@@ -116,26 +116,26 @@ module Term
       end
 
 			def wrap(str, max_size, prefix="")
-				all = []
-				line = ''
-				str.split(/ /).each { |w|
-					if rlen(line+w) >= max_size - rlen(prefix)
-						all.push(line)
-						line = ''
-					end
-					w ||= ' '
-					line += line == '' ? w : ' ' + w
-				}
-				a = true
-				all.push(line).collect { |i|
-					if a
-						i = prefix + i
-						a = false
-					else
-						i = " " * rlen(prefix) + i
-					end
-					i
-				}
+        # This is my attempt to fix line wrapping.
+        all = []
+        line = ""
+        tokens = str.tokenize
+        tokens.each do |tok|
+          case tok[0]
+          when :tag
+            line << "%(#{tok[1]})"
+          when :text
+            tok[1].split(//).each do |char|
+              if rlen(line+char) >= max_size - rlen(prefix)
+                all.push(line)
+                line = ""
+              end
+              line << char
+            end
+          end
+        end
+        all << line
+        all
 			end
 			private :wrap
 
@@ -153,16 +153,17 @@ module Term
 				end
 
 				if str.respond_to?(:to_str)
-					str.split(/\n/).each { |s|
-						s.delete!("\r")
-						@buflines.push([prefix.dup, s.dup])
-						#wrap(s, Ncurses.COLS, prefix).each { |l|
-						#	@buffer.push(l)
-						#}
-            @buffer.push s
+					str.split(/\r/).each { |s|
+						s.delete!("\n")
+            if s.length > 0
+						  @buflines.push([prefix.dup, s.dup])
+						  wrap(s, Ncurses.COLS, prefix).each { |l|
+							  @buffer.push(l)
+					  	}
+      #      @buffer.push s
             
-            self.trimbuffer
-
+              self.trimbuffer
+            end
 					}
 				end
 				refresh_buffer
