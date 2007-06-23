@@ -22,13 +22,23 @@ section of this text.  Also, since I'm tailoring termvisual to this project
 anyways, I went ahead and added KEY_UP and KEY_DOWN to the default bindings.
 Further, the command history is capped at 100 entries.
 
+Requirements
+------------
+Okay, so this is the stuff that I know for a fact works:
+
+  * ruby-1.8.5-4 (Debian Etch)
+  * ncurses-ruby
+  * log4r (for debugging)
+
+That should just about cover it.
+
 Usage
 -----
-/path/to/muddy.rb server port
+/path/to/muddy.rb (-debug) server port
 
 Example
 -------
-./muddy.rb scrymud.net 4444
+./muddy.rb -debug scrymud.net 4444
 
 Differences from Muby
 ---------------------

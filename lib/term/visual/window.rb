@@ -48,7 +48,7 @@ module Term
 			def initialize(parent, hash)
 				@parent = parent
 
-        @logger = Logger.new
+        #@logger = Logger.new
 
 				@bufsize = hash["bufsize"] || 500
 				
@@ -143,7 +143,8 @@ module Term
 			private :wrap
 
 			def addline(str, prefix="")
-        @logger.log_message("addline", str)
+        #@logger.log_message("addline", str)
+        Log.debug "addline: #{str}" unless DEBUG.nil?
 				if @global_prefix.kind_of?(String)
 					dp = @global_prefix.dup
 				elsif @global_prefix.respond_to?(:call)
