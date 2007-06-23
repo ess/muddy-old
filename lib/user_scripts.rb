@@ -6,12 +6,22 @@ class UserScripts
   @user_methods = "#{ENV['HOME']}/.muddy/user_methods.rb"
   require @user_methods if File.exist? @user_methods
 
-  def initialize(connection, window)
-    @connection = connection
-    @window = window
+  def initialize
+    @connection = MUDDYCON
+    @window = MUDDYWIN
     @triggers = Hash.new
+    @user_methods = "#{ENV['HOME']}/.muddy/user_methods.rb"
+    self.load_user_methods
   end
 
+  def load_user_methods
+    load @user_methods if File.exist? @user_methods
+  end
+
+  def reload
+    self.load_user_methods
+  end
+    
   def execute_command(thescript)
     begin
       eval thescript

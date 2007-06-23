@@ -34,29 +34,29 @@ unless DEBUG.nil?
   Log.debug "Muddy started at #{Time.now.to_s}."
 end
 
-vt = Term::Visual.new
+MUDDYVT = Term::Visual.new
 
-vt.palette.setcolors(
+MUDDYVT.palette.setcolors(
 'title'	=> 'red on green',
 'input'	=> 'bold cyan on default'
 )
     
-window = vt.create_window('title' => "window", 'bufsize' => 200)
+MUDDYWIN = MUDDYVT.create_window('title' => "window", 'bufsize' => 200)
    
-window.title = "Muddy"
-window.status = "Playing in the MUD"
+MUDDYWIN.title = "Muddy"
+MUDDYWIN.status = "Playing in the MUD"
 
-connection = Connection.new(vt, window,@host,@port)
-userscripts = UserScripts.new(connection, window)
-connection.setuserscript(userscripts)
+MUDDYCON = Connection.new(@host,@port)
+MUDDYSCRIPTS = UserScripts.new
+
 x=0
 loop do
-  if line = vt.getline
+  if line = MUDDYVT.getline
     if line.length > 1 and line[0].chr == '/'
-      userscripts.execute_command(line[1..line.length])
+      MUDDYSCRIPTS.execute_command(line[1..line.length])
     else
-      window.print "%(input)#{line}%(default)"
-      connection.send(line)
+      MUDDYWIN.print "%(input)#{line}%(default)"
+      MUDDYCON.send(line)
     end
   end
   sleep 0.0001

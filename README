@@ -149,7 +149,11 @@ Bugs
 ----
 The text wrapping bug has been fixed as of 2007-06-12.
 
-There have been no other bugs brought to my attention.
+Due to the nature of the way that some MUDs generate ANSI color sequences,
+it's been brought to my attention that when setting a background color,
+the foreground color will more than likely be reset to false.  This causes
+an effect such that the text is styled as "black on background."  I'm working
+on it.
 
 -- Scruff
 pooster@gmail.com

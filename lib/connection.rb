@@ -2,11 +2,11 @@ require 'socket'
 
 class Connection
 
-  def initialize(thevt,thewindow, host, port)
+  def initialize(host, port)
     @fgcolor = "default"
     @bgcolor = "default"
-    @vt = thevt
-    @window = thewindow
+    @vt = MUDDYVT
+    @window = MUDDYWIN
     @host = host
     @port = port
     @socket = TCPSocket.open(host, port) if host && port
@@ -19,10 +19,6 @@ class Connection
         @window.print "#{e.class}:#{e.message}"
       end
     end if @socket
-  end
-
-  def setuserscript(userscript)
-    @userscript = userscript
   end
 
   def close
@@ -47,11 +43,8 @@ class Connection
 
   def display_buffer
     unless @showBuffer.empty?
-      #logfile = File.open("logfile.txt", "a")
       @showBuffer.gsub(/\[0m/, "")
       @window.print(*@showBuffer )
-      #logfile.print(*@showBuffer)
-      #logfile.close
     end
     @showBuffer = ""
   end
@@ -59,9 +52,8 @@ class Connection
   def manage_buffer(c)
     if c == 10 or c == 0 or c == 13
       temp = @showBuffer.gsub(/\%\(([a-z]|[A-Z]| )+\)/,'').gsub(/ +/,' ')
-      @userscript.match_triggers(temp)
+      MUDDYSCRIPTS.match_triggers(temp)
       display_buffer
-      #@showBuffer = insert_style(@fgcolor, @bgcolor)
     end
   end
 
