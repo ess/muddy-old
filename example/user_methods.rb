@@ -111,7 +111,7 @@ end
 # you are in the Temple of Garland, and you issue the following command,
 # you will end up at the eastern border of Bandra:  /path "garland_to_bandra"
 def path(thepath)
-  send(eval thepath)
+  send(eval(thepath))
 end   
 
 # This one is to help the clueless newbies know where to go.  You use it the

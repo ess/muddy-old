@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 SCRIPT_DIR = File.expand_path(File.dirname(__FILE__))
+DOT_MUDDY = "#{ENV['HOME']}/.muddy"
 $: << SCRIPT_DIR
+
+Dir.mkdir DOT_MUDDY unless File.exist? DOT_MUDDY
 
 require 'lib/connection'
 require 'lib/user_scripts'
@@ -26,7 +29,7 @@ end
 unless DEBUG.nil?
   Log = Log4r::Logger.new("mylogger")
   Log4r::FileOutputter.new('log', 
-                           :filename => "#{SCRIPT_DIR}/logs/log-#{Time.now.to_i}",
+                           :filename => "#{DOT_MUDDY}/logs/log-#{Time.now.to_i}",
                            :trunc => true,
                            :level => Log4r::DEBUG)
   Log.add('log')
@@ -38,7 +41,8 @@ MUDDYVT = Term::Visual.new
 
 MUDDYVT.palette.setcolors(
 'title'	=> 'red on green',
-'input'	=> 'bold cyan on default'
+'input'	=> 'bold cyan on default',
+'system' => 'bold green on default'
 )
     
 MUDDYWIN = MUDDYVT.create_window('title' => "window", 'bufsize' => 200)
