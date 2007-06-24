@@ -27,6 +27,7 @@ else
 end
 
 unless DEBUG.nil?
+  Dir.mkdir "#{DOT_MUDDY}/logs" unless File.exist? "#{DOT_MUDDY}/logs"
   Log = Log4r::Logger.new("mylogger")
   Log4r::FileOutputter.new('log', 
                            :filename => "#{DOT_MUDDY}/logs/log-#{Time.now.to_i}",

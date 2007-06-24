@@ -3,6 +3,7 @@ require 'socket'
 class Connection
 
   def initialize(host, port)
+    @textattr = ""
     @fgcolor = "default"
     @bgcolor = "default"
     @vt = MUDDYVT
@@ -93,91 +94,73 @@ class Connection
           properties.each do |property|
             case property.to_i
             when 1
-              attributes = attributes | Ncurses.const_get("A_BOLD")
+              @textattr = "bold" #attributes = attributes | Ncurses.const_get("A_BOLD")
             when 2
-              attributes = attributes | Ncurses.const_get("A_DIM")
+              @textattr = "dim" #attributes = attributes | Ncurses.const_get("A_DIM")
             when 4
-              attributes = attributes | Ncurses.const_get("A_UNDERLINE")
+              @textattr = "underline" #attributes = attributes | Ncurses.const_get("A_UNDERLINE")
             when 5
-              attributes = attributes | Ncurses.const_get("A_BLINK") unless conf.disable_blink
+              @textattr = "blink" #attributes = attributes | Ncurses.const_get("A_BLINK") unless conf.disable_blink
             when 7
-              attributes = attributes | Ncurses.const_get("A_REVERSE")
+              @textattr = "reverse" #attributes = attributes | Ncurses.const_get("A_REVERSE")
             when 8
-              attributes = attributes | Ncurses.const_get("A_INVIS")
+              @textattr = "invisible" #attributes = attributes | Ncurses.const_get("A_INVIS")
             when 30
-              fgcolor = "black" # Ncurses.const_get("COLOR_BLACK")
+              @fgcolor = "black" # Ncurses.const_get("COLOR_BLACK")
             when 31
-              fgcolor = "red" # Ncurses.const_get("COLOR_RED")
+              @fgcolor = "red" # Ncurses.const_get("COLOR_RED")
             when 32
-              fgcolor = "green" #Ncurses.const_get("COLOR_GREEN")
+              @fgcolor = "green" #Ncurses.const_get("COLOR_GREEN")
             when 33
-              fgcolor = "yellow" #Ncurses.const_get("COLOR_YELLOW")
+              @fgcolor = "yellow" #Ncurses.const_get("COLOR_YELLOW")
             when 34
-              fgcolor = "blue" #Ncurses.const_get("COLOR_BLUE")
+              @fgcolor = "blue" #Ncurses.const_get("COLOR_BLUE")
             when 35
-              fgcolor = "magenta" #Ncurses.const_get("COLOR_MAGENTA")
+              @fgcolor = "magenta" #Ncurses.const_get("COLOR_MAGENTA")
             when 36
-              fgcolor = "cyan" #Ncurses.const_get("COLOR_CYAN")
+              @fgcolor = "cyan" #Ncurses.const_get("COLOR_CYAN")
             when 37
-              fgcolor = "white" #Ncurses.const_get("COLOR_WHITE")
+              @fgcolor = "white" #Ncurses.const_get("COLOR_WHITE")
             when 40
-              bgcolor = "black" #Ncurses.const_get("COLOR_BLACK")
+              @bgcolor = "black" #Ncurses.const_get("COLOR_BLACK")
             when 41
-              bgcolor = "red" #Ncurses.const_get("COLOR_RED")
+              @bgcolor = "red" #Ncurses.const_get("COLOR_RED")
             when 42
-              bgcolor = "green" #Ncurses.const_get("COLOR_GREEN")
+              @bgcolor = "green" #Ncurses.const_get("COLOR_GREEN")
             when 43
-              bgcolor = "yellow" #Ncurses.const_get("COLOR_YELLOW")
+              @bgcolor = "yellow" #Ncurses.const_get("COLOR_YELLOW")
             when 44
-              bgcolor = "blue" #Ncurses.const_get("COLOR_BLUE")
+              @bgcolor = "blue" #Ncurses.const_get("COLOR_BLUE")
             when 45
-              bgcolor = "magenta" #Ncurses.const_get("COLOR_MAGENTA")
+              @bgcolor = "magenta" #Ncurses.const_get("COLOR_MAGENTA")
             when 46
-              bgcolor = "cyan" #Ncurses.const_get("COLOR_CYAN")
+              @bgcolor = "cyan" #Ncurses.const_get("COLOR_CYAN")
             when 47
-              bgcolor = "white" #Ncurses.const_get("COLOR_WHITE")
+              @bgcolor = "white" #Ncurses.const_get("COLOR_WHITE")
             end
           end
           if reset
-            #@fgcolor = @bgcolor = 'default'
-            insert_style('default')
+            @fgcolor = @bgcolor = 'default'
+            @textattr = ""
+            insert_style()
   #          @showBuffer << "%(default)"
           else
-            @vt.palette.setcolor("#{fgcolor} on #{bgcolor ? bgcolor : 'default'}", "#{fgcolor} on #{bgcolor ? bgcolor : 'default'}" )
-            @fgcolor = fgcolor
-            @bgcolor = bgcolor ? bgcolor : 'default'
-            insert_style(@fgcolor, @bgcolor)
+            insert_style
    #         @showBuffer << "%(#{fgcolor} on #{bgcolor ? bgcolor : 'default'})"
           end
         end
       end
       else #if ! conf.broken_keycodes.include?(c)
-      #
-      # This is not telnet command OR ansi, lets treat it as nice MUD text!
-      #
-      # Debug about it, add it to match buffer, add it to show buffer and show if we want to show.
-      # Then check it for triggers.
-      #
-      #@matchBuffer = @matchBuffer + c.chr
-      #append_show_buffer(c.chr)
-      #manage_buffers(c)
-      
-      #unless @fgcolor == 'default' or c.chr =~ /(\n| )/
-      #  value = "%(#{@fgcolor} on #{@bgcolor ? @bgcolor : 'default'})" + c.chr
-      #else
         value = c.chr
-      #end
       @showBuffer << value #unless [10, 0, 13].include? c
       manage_buffer(c)
     end
   end
 
-  def insert_style(fgcolor, bgcolor = 'default')
-    if fgcolor == bgcolor and bgcolor == 'default'
-      @showBuffer << "%(default)"
-    else
-      @showBuffer << "%(#{@fgcolor} on #{@bgcolor})"
-    end
+  def insert_style()
+      @vt.palette.setcolor("#{@textattr} #{@fgcolor} on #{@bgcolor}", "#{@textattr} #{@fgcolor} on #{@bgcolor}" )
+
+      @showBuffer << "%(#{@textattr} #{@fgcolor} on #{@bgcolor})"
   end
 
   def send(s)
